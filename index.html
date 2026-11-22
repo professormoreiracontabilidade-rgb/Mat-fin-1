@@ -1,0 +1,996 @@
+<!DOCTYPE html>
+<html lang="pt-BR"><head><script>(function(){
+function slug(s){
+  try{return s.trim().toLowerCase().replace(/[^\p{L}\p{N}\s_-]/gu,'').replace(/\s+/g,'-');}
+  catch(e){return s.trim().toLowerCase().replace(/[^a-z0-9\s_-]/g,'').replace(/\s+/g,'-');}
+}
+function findHashTarget(hash){
+  if(!hash||hash==='#')return null;
+  var raw=hash.charAt(0)==='#'?hash.slice(1):hash;
+  var dec=raw;
+  try{dec=decodeURIComponent(raw);}catch(e){}
+  var el=document.getElementById(raw)||document.getElementById(dec);
+  if(el)return el;
+  try{
+    if(typeof CSS!=='undefined'&&CSS.escape){
+      el=document.querySelector('[name="'+CSS.escape(raw)+'"]')||
+         document.querySelector('[name="'+CSS.escape(dec)+'"]');
+    }else{
+      var named=document.getElementsByName(raw);
+      if(named&&named.length>0)return named[0];
+    }
+  }catch(e){}
+  if(el)return el;
+  var targetSlug=slug(dec);
+  if(targetSlug){
+    var headings=document.querySelectorAll('h1,h2,h3,h4,h5,h6');
+    for(var i=0;i<headings.length;i++){
+      if(slug(headings[i].textContent||'')===targetSlug)return headings[i];
+    }
+  }
+  return null;
+}
+function getInPageHash(a,href){
+  if(href.charAt(0)==='#')return href;
+  try{
+    var u=new URL(href,window.location.href);
+    if(u.hash&&u.origin===window.location.origin&&u.pathname===window.location.pathname){
+      return u.hash;
+    }
+  }catch(e){}
+  return null;
+}
+function findAnchor(target){
+  var el=target instanceof Element?target:(target&&target.parentElement?target.parentElement:null);
+  return el&&typeof el.closest==='function'?el.closest('a'):null;
+}
+function configureAnchor(a){
+  var href=a.getAttribute('href');
+  if(!href||href.trim().toLowerCase().indexOf('javascript:')===0||a.hasAttribute('download'))return;
+  if(getInPageHash(a,href)!==null)return;
+  var t=a.getAttribute('target');
+  if(!t||t.toLowerCase()!=='_blank'){a.setAttribute('target','_blank');}
+  if(!a.getAttribute('rel')){a.setAttribute('rel','noopener noreferrer');}
+}
+function configureAllAnchors(){
+  var anchors=document.querySelectorAll('a[href]');
+  for(var i=0;i<anchors.length;i++){configureAnchor(anchors[i]);}
+}
+if(document.readyState==='loading'){
+  document.addEventListener('DOMContentLoaded',configureAllAnchors,{once:true});
+}else{
+  configureAllAnchors();
+}
+document.addEventListener('click',function(event){
+  var a=findAnchor(event.target);
+  if(a)configureAnchor(a);
+},{capture:true});
+document.addEventListener('click',function(event){
+  if(event.defaultPrevented)return;
+  var a=findAnchor(event.target);
+  if(!a)return;
+  var href=a.getAttribute('href');
+  if(!href||href.trim().toLowerCase().indexOf('javascript:')===0||a.hasAttribute('download'))return;
+  var hash=getInPageHash(a,href);
+  if(hash===null)return;
+  event.preventDefault();
+  if(hash==='#'){window.scrollTo({top:0,behavior:'smooth'});return;}
+  var targetEl=findHashTarget(hash);
+  if(targetEl){targetEl.scrollIntoView({behavior:'smooth',block:'start'});}
+});
+})();</script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Carrossel Instagram 1080x1350 — Curso de Contabilidade Professor Moreira</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Inter & Plus Jakarta Sans -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=Plus+Jakarta+Sans:wght@600;700;800&amp;display=swap" rel="stylesheet">
+    <!-- html2canvas para exportação fiel em 1080x1350px -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+    <style>
+        /* Configurações tipográficas e base */
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #E5E7EB;
+            color: #1F2937;
+            overflow-x: hidden;
+        }
+
+        .font-display {
+            font-family: 'Plus Jakarta Sans', 'Inter', sans-serif;
+        }
+
+        /* Dimensões exatas do Instagram Portrait (4:5 = 1080x1350px) */
+        .slide-canvas {
+            width: 1080px;
+            height: 1350px;
+            background-color: #FFFFFF;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            box-sizing: border-box;
+            overflow: hidden;
+            flex-shrink: 0;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+        }
+
+        /* Wrapper responsivo que escala o slide 1080x1350 para caber na tela do usuário */
+        .slide-preview-wrapper {
+            position: relative;
+            margin: 0 auto;
+            overflow: hidden;
+            border-radius: 16px;
+            box-shadow: 0 20px 35px -10px rgba(0, 0, 0, 0.22);
+            background: #FFFFFF;
+        }
+
+        .slide-scale-inner {
+            transform-origin: top left;
+            width: 1080px;
+            height: 1350px;
+        }
+
+        /* Frações matemáticas limpas para renderização perfeita no html2canvas */
+        .math-fraction {
+            display: inline-flex;
+            flex-direction: column;
+            align-items: center;
+            vertical-align: middle;
+            margin: 0 8px;
+        }
+
+        .math-numerator {
+            border-bottom: 3.5px solid #1F2937;
+            padding: 0 14px 6px 14px;
+            line-height: 1.15;
+        }
+
+        .math-numerator.accent {
+            border-bottom-color: #7B1113;
+        }
+
+        .math-denominator {
+            padding: 6px 14px 0 14px;
+            line-height: 1.15;
+        }
+
+        /* Padrão sutil editorial de fundo */
+        .editorial-grid-bg {
+            background-image: radial-gradient(#7B111314 1.5px, transparent 1.5px);
+            background-size: 28px 28px;
+        }
+
+        /* Animação do toast de notificação */
+        @keyframes slideUp {
+            from { transform: translateY(20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        .toast-enter {
+            animation: slideUp 0.25s ease-out forwards;
+        }
+    </style>
+<style>*, ::before, ::after{--tw-border-spacing-x:0;--tw-border-spacing-y:0;--tw-translate-x:0;--tw-translate-y:0;--tw-rotate:0;--tw-skew-x:0;--tw-skew-y:0;--tw-scale-x:1;--tw-scale-y:1;--tw-pan-x: ;--tw-pan-y: ;--tw-pinch-zoom: ;--tw-scroll-snap-strictness:proximity;--tw-gradient-from-position: ;--tw-gradient-via-position: ;--tw-gradient-to-position: ;--tw-ordinal: ;--tw-slashed-zero: ;--tw-numeric-figure: ;--tw-numeric-spacing: ;--tw-numeric-fraction: ;--tw-ring-inset: ;--tw-ring-offset-width:0px;--tw-ring-offset-color:#fff;--tw-ring-color:rgb(59 130 246 / 0.5);--tw-ring-offset-shadow:0 0 #0000;--tw-ring-shadow:0 0 #0000;--tw-shadow:0 0 #0000;--tw-shadow-colored:0 0 #0000;--tw-blur: ;--tw-brightness: ;--tw-contrast: ;--tw-grayscale: ;--tw-hue-rotate: ;--tw-invert: ;--tw-saturate: ;--tw-sepia: ;--tw-drop-shadow: ;--tw-backdrop-blur: ;--tw-backdrop-brightness: ;--tw-backdrop-contrast: ;--tw-backdrop-grayscale: ;--tw-backdrop-hue-rotate: ;--tw-backdrop-invert: ;--tw-backdrop-opacity: ;--tw-backdrop-saturate: ;--tw-backdrop-sepia: ;--tw-contain-size: ;--tw-contain-layout: ;--tw-contain-paint: ;--tw-contain-style: }::backdrop{--tw-border-spacing-x:0;--tw-border-spacing-y:0;--tw-translate-x:0;--tw-translate-y:0;--tw-rotate:0;--tw-skew-x:0;--tw-skew-y:0;--tw-scale-x:1;--tw-scale-y:1;--tw-pan-x: ;--tw-pan-y: ;--tw-pinch-zoom: ;--tw-scroll-snap-strictness:proximity;--tw-gradient-from-position: ;--tw-gradient-via-position: ;--tw-gradient-to-position: ;--tw-ordinal: ;--tw-slashed-zero: ;--tw-numeric-figure: ;--tw-numeric-spacing: ;--tw-numeric-fraction: ;--tw-ring-inset: ;--tw-ring-offset-width:0px;--tw-ring-offset-color:#fff;--tw-ring-color:rgb(59 130 246 / 0.5);--tw-ring-offset-shadow:0 0 #0000;--tw-ring-shadow:0 0 #0000;--tw-shadow:0 0 #0000;--tw-shadow-colored:0 0 #0000;--tw-blur: ;--tw-brightness: ;--tw-contrast: ;--tw-grayscale: ;--tw-hue-rotate: ;--tw-invert: ;--tw-saturate: ;--tw-sepia: ;--tw-drop-shadow: ;--tw-backdrop-blur: ;--tw-backdrop-brightness: ;--tw-backdrop-contrast: ;--tw-backdrop-grayscale: ;--tw-backdrop-hue-rotate: ;--tw-backdrop-invert: ;--tw-backdrop-opacity: ;--tw-backdrop-saturate: ;--tw-backdrop-sepia: ;--tw-contain-size: ;--tw-contain-layout: ;--tw-contain-paint: ;--tw-contain-style: }/* ! tailwindcss v3.4.17 | MIT License | https://tailwindcss.com */*,::after,::before{box-sizing:border-box;border-width:0;border-style:solid;border-color:#e5e7eb}::after,::before{--tw-content:''}:host,html{line-height:1.5;-webkit-text-size-adjust:100%;-moz-tab-size:4;tab-size:4;font-family:ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";font-feature-settings:normal;font-variation-settings:normal;-webkit-tap-highlight-color:transparent}body{margin:0;line-height:inherit}hr{height:0;color:inherit;border-top-width:1px}abbr:where([title]){-webkit-text-decoration:underline dotted;text-decoration:underline dotted}h1,h2,h3,h4,h5,h6{font-size:inherit;font-weight:inherit}a{color:inherit;text-decoration:inherit}b,strong{font-weight:bolder}code,kbd,pre,samp{font-family:ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;font-feature-settings:normal;font-variation-settings:normal;font-size:1em}small{font-size:80%}sub,sup{font-size:75%;line-height:0;position:relative;vertical-align:baseline}sub{bottom:-.25em}sup{top:-.5em}table{text-indent:0;border-color:inherit;border-collapse:collapse}button,input,optgroup,select,textarea{font-family:inherit;font-feature-settings:inherit;font-variation-settings:inherit;font-size:100%;font-weight:inherit;line-height:inherit;letter-spacing:inherit;color:inherit;margin:0;padding:0}button,select{text-transform:none}button,input:where([type=button]),input:where([type=reset]),input:where([type=submit]){-webkit-appearance:button;background-color:transparent;background-image:none}:-moz-focusring{outline:auto}:-moz-ui-invalid{box-shadow:none}progress{vertical-align:baseline}::-webkit-inner-spin-button,::-webkit-outer-spin-button{height:auto}[type=search]{-webkit-appearance:textfield;outline-offset:-2px}::-webkit-search-decoration{-webkit-appearance:none}::-webkit-file-upload-button{-webkit-appearance:button;font:inherit}summary{display:list-item}blockquote,dd,dl,figure,h1,h2,h3,h4,h5,h6,hr,p,pre{margin:0}fieldset{margin:0;padding:0}legend{padding:0}menu,ol,ul{list-style:none;margin:0;padding:0}dialog{padding:0}textarea{resize:vertical}input::placeholder,textarea::placeholder{opacity:1;color:#9ca3af}[role=button],button{cursor:pointer}:disabled{cursor:default}audio,canvas,embed,iframe,img,object,svg,video{display:block;vertical-align:middle}img,video{max-width:100%;height:auto}[hidden]:where(:not([hidden=until-found])){display:none}.pointer-events-none{pointer-events:none}.pointer-events-auto{pointer-events:auto}.fixed{position:fixed}.relative{position:relative}.sticky{position:sticky}.inset-0{inset:0px}.top-0{top:0px}.bottom-5{bottom:1.25rem}.right-5{right:1.25rem}.z-50{z-index:50}.mx-1{margin-left:0.25rem;margin-right:0.25rem}.mx-6{margin-left:1.5rem;margin-right:1.5rem}.mx-auto{margin-left:auto;margin-right:auto}.mx-3{margin-left:0.75rem;margin-right:0.75rem}.mx-4{margin-left:1rem;margin-right:1rem}.mb-4{margin-bottom:1rem}.mb-5{margin-bottom:1.25rem}.ml-0\.5{margin-left:0.125rem}.mb-2{margin-bottom:0.5rem}.mb-3{margin-bottom:0.75rem}.mt-1\.5{margin-top:0.375rem}.block{display:block}.inline-block{display:inline-block}.flex{display:flex}.inline-flex{display:inline-flex}.grid{display:grid}.hidden{display:none}.h-10{height:2.5rem}.h-11{height:2.75rem}.h-2{height:0.5rem}.h-3\.5{height:0.875rem}.h-4{height:1rem}.h-6{height:1.5rem}.h-5{height:1.25rem}.h-8{height:2rem}.h-2\.5{height:0.625rem}.max-h-\[88vh\]{max-height:88vh}.min-h-screen{min-height:100vh}.w-10{width:2.5rem}.w-11{width:2.75rem}.w-20{width:5rem}.w-3\.5{width:0.875rem}.w-4{width:1rem}.w-\[1px\]{width:1px}.w-full{width:100%}.w-5{width:1.25rem}.w-8{width:2rem}.w-2\.5{width:0.625rem}.max-w-7xl{max-width:80rem}.max-w-\[620px\]{max-width:620px}.max-w-4xl{max-width:56rem}.flex-1{flex:1 1 0%}.shrink-0{flex-shrink:0}.border-collapse{border-collapse:collapse}@keyframes pulse{50%{opacity:.5}}.animate-pulse{animation:pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite}.cursor-pointer{cursor:pointer}.resize-none{resize:none}.grid-cols-1{grid-template-columns:repeat(1, minmax(0, 1fr))}.grid-cols-2{grid-template-columns:repeat(2, minmax(0, 1fr))}.flex-col{flex-direction:column}.flex-wrap{flex-wrap:wrap}.items-start{align-items:flex-start}.items-center{align-items:center}.justify-end{justify-content:flex-end}.justify-center{justify-content:center}.justify-between{justify-content:space-between}.gap-1{gap:0.25rem}.gap-1\.5{gap:0.375rem}.gap-2{gap:0.5rem}.gap-3{gap:0.75rem}.gap-3\.5{gap:0.875rem}.gap-4{gap:1rem}.gap-5{gap:1.25rem}.gap-7{gap:1.75rem}.gap-9{gap:2.25rem}.gap-8{gap:2rem}.gap-y-3{row-gap:0.75rem}.space-y-12 > :not([hidden]) ~ :not([hidden]){--tw-space-y-reverse:0;margin-top:calc(3rem * calc(1 - var(--tw-space-y-reverse)));margin-bottom:calc(3rem * var(--tw-space-y-reverse))}.space-y-5 > :not([hidden]) ~ :not([hidden]){--tw-space-y-reverse:0;margin-top:calc(1.25rem * calc(1 - var(--tw-space-y-reverse)));margin-bottom:calc(1.25rem * var(--tw-space-y-reverse))}.space-y-6 > :not([hidden]) ~ :not([hidden]){--tw-space-y-reverse:0;margin-top:calc(1.5rem * calc(1 - var(--tw-space-y-reverse)));margin-bottom:calc(1.5rem * var(--tw-space-y-reverse))}.divide-y > :not([hidden]) ~ :not([hidden]){--tw-divide-y-reverse:0;border-top-width:calc(1px * calc(1 - var(--tw-divide-y-reverse)));border-bottom-width:calc(1px * var(--tw-divide-y-reverse))}.divide-gray-200 > :not([hidden]) ~ :not([hidden]){--tw-divide-opacity:1;border-color:rgb(229 231 235 / var(--tw-divide-opacity, 1))}.self-start{align-self:flex-start}.overflow-hidden{overflow:hidden}.whitespace-nowrap{white-space:nowrap}.rounded-2xl{border-radius:1rem}.rounded-3xl{border-radius:1.5rem}.rounded-full{border-radius:9999px}.rounded-lg{border-radius:0.5rem}.rounded-xl{border-radius:0.75rem}.rounded{border-radius:0.25rem}.rounded-r-2xl{border-top-right-radius:1rem;border-bottom-right-radius:1rem}.border{border-width:1px}.border-2{border-width:2px}.border-y-4{border-top-width:4px;border-bottom-width:4px}.border-b{border-bottom-width:1px}.border-l-4{border-left-width:4px}.border-l-\[10px\]{border-left-width:10px}.border-t-2{border-top-width:2px}.border-l-8{border-left-width:8px}.border-t{border-top-width:1px}.border-\[\#7B1113\]{--tw-border-opacity:1;border-color:rgb(123 17 19 / var(--tw-border-opacity, 1))}.border-\[\#7B1113\]\/20{border-color:rgb(123 17 19 / 0.2)}.border-\[\#7B1113\]\/25{border-color:rgb(123 17 19 / 0.25)}.border-\[\#7B1113\]\/30{border-color:rgb(123 17 19 / 0.3)}.border-\[\#7B1113\]\/40{border-color:rgb(123 17 19 / 0.4)}.border-gray-200{--tw-border-opacity:1;border-color:rgb(229 231 235 / var(--tw-border-opacity, 1))}.border-gray-300{--tw-border-opacity:1;border-color:rgb(209 213 219 / var(--tw-border-opacity, 1))}.border-\[\#7B1113\]\/35{border-color:rgb(123 17 19 / 0.35)}.border-gray-700{--tw-border-opacity:1;border-color:rgb(55 65 81 / var(--tw-border-opacity, 1))}.bg-\[\#7B1113\]{--tw-bg-opacity:1;background-color:rgb(123 17 19 / var(--tw-bg-opacity, 1))}.bg-\[\#F8F9FA\]{--tw-bg-opacity:1;background-color:rgb(248 249 250 / var(--tw-bg-opacity, 1))}.bg-\[\#FDF2F2\]{--tw-bg-opacity:1;background-color:rgb(253 242 242 / var(--tw-bg-opacity, 1))}.bg-gray-100{--tw-bg-opacity:1;background-color:rgb(243 244 246 / var(--tw-bg-opacity, 1))}.bg-gray-300{--tw-bg-opacity:1;background-color:rgb(209 213 219 / var(--tw-bg-opacity, 1))}.bg-white{--tw-bg-opacity:1;background-color:rgb(255 255 255 / var(--tw-bg-opacity, 1))}.bg-white\/15{background-color:rgb(255 255 255 / 0.15)}.bg-white\/95{background-color:rgb(255 255 255 / 0.95)}.bg-\[\#1F2937\]{--tw-bg-opacity:1;background-color:rgb(31 41 55 / var(--tw-bg-opacity, 1))}.bg-black\/20{background-color:rgb(0 0 0 / 0.2)}.bg-black\/60{background-color:rgb(0 0 0 / 0.6)}.bg-gray-900{--tw-bg-opacity:1;background-color:rgb(17 24 39 / var(--tw-bg-opacity, 1))}.bg-emerald-700{--tw-bg-opacity:1;background-color:rgb(4 120 87 / var(--tw-bg-opacity, 1))}.p-10{padding:2.5rem}.p-4{padding:1rem}.p-6{padding:1.5rem}.p-9{padding:2.25rem}.p-2{padding:0.5rem}.p-7{padding:1.75rem}.p-8{padding:2rem}.px-1{padding-left:0.25rem;padding-right:0.25rem}.px-14{padding-left:3.5rem;padding-right:3.5rem}.px-16{padding-left:4rem;padding-right:4rem}.px-3{padding-left:0.75rem;padding-right:0.75rem}.px-3\.5{padding-left:0.875rem;padding-right:0.875rem}.px-4{padding-left:1rem;padding-right:1rem}.px-5{padding-left:1.25rem;padding-right:1.25rem}.px-7{padding-left:1.75rem;padding-right:1.75rem}.px-8{padding-left:2rem;padding-right:2rem}.py-1{padding-top:0.25rem;padding-bottom:0.25rem}.py-1\.5{padding-top:0.375rem;padding-bottom:0.375rem}.py-2{padding-top:0.5rem;padding-bottom:0.5rem}.py-2\.5{padding-top:0.625rem;padding-bottom:0.625rem}.py-3\.5{padding-top:0.875rem;padding-bottom:0.875rem}.py-4{padding-top:1rem;padding-bottom:1rem}.py-5{padding-top:1.25rem;padding-bottom:1.25rem}.py-7{padding-top:1.75rem;padding-bottom:1.75rem}.py-8{padding-top:2rem;padding-bottom:2rem}.py-9{padding-top:2.25rem;padding-bottom:2.25rem}.px-1\.5{padding-left:0.375rem;padding-right:0.375rem}.px-6{padding-left:1.5rem;padding-right:1.5rem}.py-0\.5{padding-top:0.125rem;padding-bottom:0.125rem}.py-3{padding-top:0.75rem;padding-bottom:0.75rem}.py-6{padding-top:1.5rem;padding-bottom:1.5rem}.pb-6{padding-bottom:1.5rem}.pt-1{padding-top:0.25rem}.pt-14{padding-top:3.5rem}.text-left{text-align:left}.font-mono{font-family:ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace}.text-\[21px\]{font-size:21px}.text-\[22px\]{font-size:22px}.text-\[23px\]{font-size:23px}.text-\[24px\]{font-size:24px}.text-\[25px\]{font-size:25px}.text-\[26px\]{font-size:26px}.text-\[28px\]{font-size:28px}.text-\[31px\]{font-size:31px}.text-\[34px\]{font-size:34px}.text-\[52px\]{font-size:52px}.text-\[54px\]{font-size:54px}.text-base{font-size:1rem;line-height:1.5rem}.text-lg{font-size:1.125rem;line-height:1.75rem}.text-sm{font-size:0.875rem;line-height:1.25rem}.text-xs{font-size:0.75rem;line-height:1rem}.text-\[19px\]{font-size:19px}.text-\[20px\]{font-size:20px}.text-\[27px\]{font-size:27px}.text-\[30px\]{font-size:30px}.text-\[32px\]{font-size:32px}.text-\[38px\]{font-size:38px}.text-\[40px\]{font-size:40px}.text-\[42px\]{font-size:42px}.text-\[48px\]{font-size:48px}.font-bold{font-weight:700}.font-extrabold{font-weight:800}.font-medium{font-weight:500}.font-semibold{font-weight:600}.uppercase{text-transform:uppercase}.leading-\[1\.15\]{line-height:1.15}.leading-\[1\.48\]{line-height:1.48}.leading-\[1\.5\]{line-height:1.5}.leading-snug{line-height:1.375}.leading-tight{line-height:1.25}.leading-\[1\.45\]{line-height:1.45}.leading-none{line-height:1}.leading-relaxed{line-height:1.625}.tracking-\[0\.14em\]{letter-spacing:0.14em}.tracking-\[0\.15em\]{letter-spacing:0.15em}.tracking-tight{letter-spacing:-0.025em}.tracking-wide{letter-spacing:0.025em}.tracking-wider{letter-spacing:0.05em}.text-\[\#1F2937\]{--tw-text-opacity:1;color:rgb(31 41 55 / var(--tw-text-opacity, 1))}.text-\[\#7B1113\]{--tw-text-opacity:1;color:rgb(123 17 19 / var(--tw-text-opacity, 1))}.text-gray-400{--tw-text-opacity:1;color:rgb(156 163 175 / var(--tw-text-opacity, 1))}.text-gray-500{--tw-text-opacity:1;color:rgb(107 114 128 / var(--tw-text-opacity, 1))}.text-gray-700{--tw-text-opacity:1;color:rgb(55 65 81 / var(--tw-text-opacity, 1))}.text-gray-800{--tw-text-opacity:1;color:rgb(31 41 55 / var(--tw-text-opacity, 1))}.text-gray-900{--tw-text-opacity:1;color:rgb(17 24 39 / var(--tw-text-opacity, 1))}.text-white{--tw-text-opacity:1;color:rgb(255 255 255 / var(--tw-text-opacity, 1))}.text-white\/90{color:rgb(255 255 255 / 0.9)}.text-gray-100{--tw-text-opacity:1;color:rgb(243 244 246 / var(--tw-text-opacity, 1))}.text-white\/80{color:rgb(255 255 255 / 0.8)}.text-white\/95{color:rgb(255 255 255 / 0.95)}.underline{-webkit-text-decoration-line:underline;text-decoration-line:underline}.decoration-\[\#7B1113\]{-webkit-text-decoration-color:#7B1113;text-decoration-color:#7B1113}.decoration-white\/60{-webkit-text-decoration-color:rgb(255 255 255 / 0.6);text-decoration-color:rgb(255 255 255 / 0.6)}.decoration-4{text-decoration-thickness:4px}.underline-offset-4{text-underline-offset:4px}.shadow-md{--tw-shadow:0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);--tw-shadow-colored:0 4px 6px -1px var(--tw-shadow-color), 0 2px 4px -2px var(--tw-shadow-color);box-shadow:var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow)}.shadow-sm{--tw-shadow:0 1px 2px 0 rgb(0 0 0 / 0.05);--tw-shadow-colored:0 1px 2px 0 var(--tw-shadow-color);box-shadow:var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow)}.shadow-2xl{--tw-shadow:0 25px 50px -12px rgb(0 0 0 / 0.25);--tw-shadow-colored:0 25px 50px -12px var(--tw-shadow-color);box-shadow:var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow)}.shadow-xl{--tw-shadow:0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);--tw-shadow-colored:0 20px 25px -5px var(--tw-shadow-color), 0 8px 10px -6px var(--tw-shadow-color);box-shadow:var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow)}.backdrop-blur-md{--tw-backdrop-blur:blur(12px);-webkit-backdrop-filter:var(--tw-backdrop-blur) var(--tw-backdrop-brightness) var(--tw-backdrop-contrast) var(--tw-backdrop-grayscale) var(--tw-backdrop-hue-rotate) var(--tw-backdrop-invert) var(--tw-backdrop-opacity) var(--tw-backdrop-saturate) var(--tw-backdrop-sepia);backdrop-filter:var(--tw-backdrop-blur) var(--tw-backdrop-brightness) var(--tw-backdrop-contrast) var(--tw-backdrop-grayscale) var(--tw-backdrop-hue-rotate) var(--tw-backdrop-invert) var(--tw-backdrop-opacity) var(--tw-backdrop-saturate) var(--tw-backdrop-sepia)}.backdrop-blur-sm{--tw-backdrop-blur:blur(4px);-webkit-backdrop-filter:var(--tw-backdrop-blur) var(--tw-backdrop-brightness) var(--tw-backdrop-contrast) var(--tw-backdrop-grayscale) var(--tw-backdrop-hue-rotate) var(--tw-backdrop-invert) var(--tw-backdrop-opacity) var(--tw-backdrop-saturate) var(--tw-backdrop-sepia);backdrop-filter:var(--tw-backdrop-blur) var(--tw-backdrop-brightness) var(--tw-backdrop-contrast) var(--tw-backdrop-grayscale) var(--tw-backdrop-hue-rotate) var(--tw-backdrop-invert) var(--tw-backdrop-opacity) var(--tw-backdrop-saturate) var(--tw-backdrop-sepia)}.transition{transition-property:color, background-color, border-color, fill, stroke, opacity, box-shadow, transform, filter, -webkit-text-decoration-color, -webkit-backdrop-filter;transition-property:color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, backdrop-filter;transition-property:color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, backdrop-filter, -webkit-text-decoration-color, -webkit-backdrop-filter;transition-timing-function:cubic-bezier(0.4, 0, 0.2, 1);transition-duration:150ms}.hover\:bg-\[\#5C0A0C\]:hover{--tw-bg-opacity:1;background-color:rgb(92 10 12 / var(--tw-bg-opacity, 1))}.hover\:bg-\[\#7B1113\]:hover{--tw-bg-opacity:1;background-color:rgb(123 17 19 / var(--tw-bg-opacity, 1))}.hover\:bg-gray-50:hover{--tw-bg-opacity:1;background-color:rgb(249 250 251 / var(--tw-bg-opacity, 1))}.hover\:bg-gray-200:hover{--tw-bg-opacity:1;background-color:rgb(229 231 235 / var(--tw-bg-opacity, 1))}.hover\:bg-white\/15:hover{background-color:rgb(255 255 255 / 0.15)}.hover\:text-white:hover{--tw-text-opacity:1;color:rgb(255 255 255 / var(--tw-text-opacity, 1))}.hover\:underline:hover{-webkit-text-decoration-line:underline;text-decoration-line:underline}.focus\:outline-none:focus{outline:2px solid transparent;outline-offset:2px}@media (min-width: 640px){.sm\:block{display:block}.sm\:flex-row{flex-direction:row}.sm\:items-center{align-items:center}.sm\:self-center{align-self:center}.sm\:text-lg{font-size:1.125rem;line-height:1.75rem}.sm\:text-sm{font-size:0.875rem;line-height:1.25rem}}@media (min-width: 1024px){.lg\:flex-row{flex-direction:row}}</style></head>
+<body class="min-h-screen flex flex-col">
+
+    <!-- Barra Superior de Controle Fixa -->
+    <header class="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-gray-200 shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 py-3.5 flex flex-col lg:flex-row items-center justify-between gap-3">
+            <!-- Identificação do Painel -->
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-[#7B1113] flex items-center justify-center text-white font-display font-extrabold text-lg shadow-sm">
+                    PM
+                </div>
+                <div>
+                    <h1 class="font-display font-bold text-gray-900 text-base sm:text-lg leading-tight">
+                        Carrossel Instagram (1080×1350px)
+                    </h1>
+                    <p class="text-xs text-gray-500 font-medium">
+                        Curso de Contabilidade Professor Moreira • 5 Lâminas Prontas
+                    </p>
+                </div>
+            </div>
+
+            <!-- Botões de Ação -->
+            <div class="flex flex-wrap items-center justify-center gap-2">
+                <button onclick="downloadSingleSlide(1)" id="btn-dl-1" class="px-3 py-2 text-xs sm:text-sm font-semibold rounded-lg bg-gray-100 hover:bg-[#7B1113] hover:text-white text-gray-800 border border-gray-300 transition cursor-pointer">Baixar Lâmina 1</button>
+                <button onclick="downloadSingleSlide(2)" id="btn-dl-2" class="px-3 py-2 text-xs sm:text-sm font-semibold rounded-lg bg-gray-100 hover:bg-[#7B1113] hover:text-white text-gray-800 border border-gray-300 transition cursor-pointer">
+                    Baixar Lâmina 2
+                </button>
+                <button onclick="downloadSingleSlide(3)" id="btn-dl-3" class="px-3 py-2 text-xs sm:text-sm font-semibold rounded-lg bg-gray-100 hover:bg-[#7B1113] hover:text-white text-gray-800 border border-gray-300 transition cursor-pointer">
+                    Baixar Lâmina 3
+                </button>
+                <button onclick="downloadSingleSlide(4)" id="btn-dl-4" class="px-3 py-2 text-xs sm:text-sm font-semibold rounded-lg bg-gray-100 hover:bg-[#7B1113] hover:text-white text-gray-800 border border-gray-300 transition cursor-pointer">
+                    Baixar Lâmina 4
+                </button>
+                <button onclick="downloadSingleSlide(5)" id="btn-dl-5" class="px-3 py-2 text-xs sm:text-sm font-semibold rounded-lg bg-gray-100 hover:bg-[#7B1113] hover:text-white text-gray-800 border border-gray-300 transition cursor-pointer">
+                    Baixar Lâmina 5
+                </button>
+
+                <div class="h-6 w-[1px] bg-gray-300 hidden sm:block mx-1"></div>
+
+                <button onclick="downloadAllSlides()" id="btn-dl-all" class="px-4 py-2 text-xs sm:text-sm font-bold rounded-lg bg-[#7B1113] hover:bg-[#5C0A0C] text-white shadow-md transition flex items-center gap-2 cursor-pointer">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+                    </svg>
+                    <span>Baixar Todas as Lâminas (PNG)</span>
+                </button>
+
+                <button onclick="openSourceModal()" class="px-3.5 py-2 text-xs sm:text-sm font-semibold rounded-lg bg-white hover:bg-gray-50 text-[#7B1113] border border-[#7B1113]/40 transition flex items-center gap-1.5 cursor-pointer">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"></path>
+                    </svg>
+                    <span>Ver Código HTML</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Área Principal com Visualização Responsiva das 5 Lâminas -->
+    <main class="flex-1 max-w-7xl w-full mx-auto px-4 py-8 space-y-12">
+
+        <!-- Aviso informativo -->
+        <div class="bg-white border-l-4 border-[#7B1113] rounded-xl p-4 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div class="text-sm text-gray-700">
+                <strong class="text-[#7B1113]">Pré-visualização proporcional:</strong> As lâminas abaixo estão escalonadas para caber na sua tela, mas serão exportadas na resolução oficial do Instagram Feed Vertical (<strong class="font-semibold">1080 × 1350 pixels</strong>, PNG de alta nitidez).
+            </div>
+            <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-[#FDF2F2] text-[#7B1113] border border-[#7B1113]/20 self-start sm:self-center whitespace-nowrap">
+                5 Slides • Proporção 4:5
+            </span>
+        </div>
+
+        <!-- ==================== LÂMINA 1 ==================== -->
+        <section class="flex flex-col items-center gap-3">
+            <div class="w-full max-w-[620px] flex items-center justify-between px-1">
+                <span class="text-sm font-bold text-gray-700 uppercase tracking-wider">Lâmina 01 / 05 — Capa (Questão na Íntegra)</span>
+                <button onclick="downloadSingleSlide(1)" class="text-xs font-bold text-[#7B1113] hover:underline flex items-center gap-1 cursor-pointer">
+                    Salvar PNG 1080×1350 ↓
+                </button>
+            </div>
+
+            <div class="slide-preview-wrapper" data-slide-wrapper="" style="width: 256px; height: 320px;">
+                <div class="slide-scale-inner" data-slide-scaler="" style="transform: scale(0.237037);">
+                    <!-- CANVAS REAL 1080x1350 -->
+                    <div id="slide-1" class="slide-canvas editorial-grid-bg">
+                        <!-- Barra Superior Editorial -->
+                        <div class="bg-[#7B1113] px-14 py-9 flex items-center justify-between text-white">
+                            <div class="flex items-center gap-4">
+                                <span class="w-3.5 h-3.5 rounded-full bg-white inline-block"></span>
+                                <span class="font-display font-extrabold tracking-[0.14em] text-[22px] uppercase">
+                                    QUESTÃO COMENTADA | MATEMÁTICA FINANCEIRA E CUSTOS
+                                </span>
+                            </div>
+                            <span class="font-display font-bold text-[22px] bg-white/15 px-5 py-1.5 rounded-full">
+                                01/05
+                            </span>
+                        </div>
+
+                        <!-- Conteúdo Central da Lâmina 1 -->
+                        <div class="px-16 py-8 flex-1 flex flex-col justify-center gap-7">
+                            <!-- Enunciado Parte 1 -->
+                            <p class="text-[31px] leading-[1.48] text-[#1F2937] font-medium">
+                                Um gestor de empresa tem três cotações de preços de fornecedores diferentes, da mesma quantidade de uma determinada matéria-prima, nas seguintes condições de pagamento:
+                            </p>
+
+                            <!-- Tabela Limpa de Cotações -->
+                            <div class="rounded-2xl overflow-hidden border-2 border-[#7B1113]/25 shadow-md bg-white">
+                                <table class="w-full text-left border-collapse">
+                                    <thead>
+                                        <tr class="bg-[#7B1113] text-white font-display text-[26px]">
+                                            <th class="py-5 px-8 font-bold tracking-wide">Fornecedor</th>
+                                            <th class="py-5 px-8 font-bold tracking-wide">Valor</th>
+                                            <th class="py-5 px-8 font-bold tracking-wide">Condição de pagamento</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="divide-y divide-gray-200 text-[28px] text-[#1F2937]">
+                                        <tr class="bg-white">
+                                            <td class="py-5 px-8 font-extrabold text-[#7B1113]">A</td>
+                                            <td class="py-5 px-8 font-semibold">R$ 3.180,00</td>
+                                            <td class="py-5 px-8 font-medium text-gray-700">À vista</td>
+                                        </tr>
+                                        <tr class="bg-[#F8F9FA]">
+                                            <td class="py-5 px-8 font-extrabold text-[#7B1113]">B</td>
+                                            <td class="py-5 px-8 font-semibold">R$ 3.200,00</td>
+                                            <td class="py-5 px-8 font-medium text-gray-700">Em 1 mês</td>
+                                        </tr>
+                                        <tr class="bg-white">
+                                            <td class="py-5 px-8 font-extrabold text-[#7B1113]">C</td>
+                                            <td class="py-5 px-8 font-semibold">R$ 3.300,00</td>
+                                            <td class="py-5 px-8 font-medium text-gray-700">Em 2 meses</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <!-- Enunciado Parte 2 -->
+                            <p class="text-[31px] leading-[1.48] text-[#1F2937] font-medium">
+                                Considerando as condições de pagamento e um custo de oportunidade de <strong class="font-bold text-[#7B1113]">1% ao mês</strong>, é mais vantajoso adquirir a matéria-prima:
+                            </p>
+
+                            <!-- Alternativas em Blocos Limpos -->
+                            <div class="grid grid-cols-1 gap-3.5 pt-1">
+                                <div class="flex items-center gap-5 bg-white border-2 border-gray-200 rounded-2xl px-7 py-4 shadow-sm">
+                                    <span class="w-11 h-11 rounded-xl bg-[#FDF2F2] border border-[#7B1113]/30 text-[#7B1113] font-display font-extrabold text-[25px] flex items-center justify-center shrink-0">a</span>
+                                    <span class="text-[28px] font-medium text-[#1F2937]">do Fornecedor A.</span>
+                                </div>
+                                <div class="flex items-center gap-5 bg-white border-2 border-gray-200 rounded-2xl px-7 py-4 shadow-sm">
+                                    <span class="w-11 h-11 rounded-xl bg-[#FDF2F2] border border-[#7B1113]/30 text-[#7B1113] font-display font-extrabold text-[25px] flex items-center justify-center shrink-0">b</span>
+                                    <span class="text-[28px] font-medium text-[#1F2937]">do Fornecedor B.</span>
+                                </div>
+                                <div class="flex items-center gap-5 bg-white border-2 border-gray-200 rounded-2xl px-7 py-4 shadow-sm">
+                                    <span class="w-11 h-11 rounded-xl bg-[#FDF2F2] border border-[#7B1113]/30 text-[#7B1113] font-display font-extrabold text-[25px] flex items-center justify-center shrink-0">c</span>
+                                    <span class="text-[28px] font-medium text-[#1F2937]">dos Fornecedores A ou C.</span>
+                                </div>
+                                <div class="flex items-center gap-5 bg-white border-2 border-gray-200 rounded-2xl px-7 py-4 shadow-sm">
+                                    <span class="w-11 h-11 rounded-xl bg-[#FDF2F2] border border-[#7B1113]/30 text-[#7B1113] font-display font-extrabold text-[25px] flex items-center justify-center shrink-0">d</span>
+                                    <span class="text-[28px] font-medium text-[#1F2937]">dos Fornecedores B ou C.</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Rodapé Oficial -->
+                        <div class="bg-[#F8F9FA] border-t-2 border-gray-200 px-14 py-7 flex items-center justify-between">
+                            <span class="text-[23px] font-bold text-[#7B1113] flex items-center gap-2">
+                                Arraste para ver a resolução passo a passo →
+                            </span>
+                            <span class="font-display font-extrabold text-[22px] text-[#1F2937] tracking-tight">
+                                Curso de Contabilidade Professor Moreira
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==================== LÂMINA 2 ==================== -->
+        <section class="flex flex-col items-center gap-3">
+            <div class="w-full max-w-[620px] flex items-center justify-between px-1">
+                <span class="text-sm font-bold text-gray-700 uppercase tracking-wider">Lâmina 02 / 05 — O Raciocínio (Conceito-Chave)</span>
+                <button onclick="downloadSingleSlide(2)" class="text-xs font-bold text-[#7B1113] hover:underline flex items-center gap-1 cursor-pointer">
+                    Salvar PNG 1080×1350 ↓
+                </button>
+            </div>
+
+            <div class="slide-preview-wrapper" data-slide-wrapper="" style="width: 256px; height: 320px;">
+                <div class="slide-scale-inner" data-slide-scaler="" style="transform: scale(0.237037);">
+                    <!-- CANVAS REAL 1080x1350 -->
+                    <div id="slide-2" class="slide-canvas editorial-grid-bg">
+                        <!-- Cabeçalho Superior -->
+                        <div class="px-16 pt-14 pb-6 flex items-center justify-between border-b border-gray-200 bg-white">
+                            <span class="inline-flex items-center gap-3 px-5 py-2.5 rounded-xl bg-[#7B1113] text-white font-display font-extrabold text-[22px] tracking-wider uppercase">
+                                PASSO 1 | CONCEITO-CHAVE
+                            </span>
+                            <span class="font-display font-extrabold text-[24px] text-gray-400">
+                                02 / 05
+                            </span>
+                        </div>
+
+                        <!-- Corpo Central da Lâmina 2 -->
+                        <div class="px-16 py-8 flex-1 flex flex-col justify-center gap-9">
+                            <!-- Título Principal -->
+                            <div>
+                                <div class="w-20 h-2 bg-[#7B1113] rounded-full mb-5"></div>
+                                <h2 class="font-display font-extrabold text-[52px] leading-[1.15] text-[#1F2937] tracking-tight">
+                                    COMO COMPARAR VALORES EM DATAS DIFERENTES?
+                                </h2>
+                            </div>
+
+                            <!-- Caixa Regra de Ouro -->
+                            <div class="bg-[#FDF2F2] border-l-[10px] border-[#7B1113] rounded-r-2xl p-9 shadow-sm">
+                                <p class="text-[31px] leading-[1.5] text-[#1F2937] font-medium">
+                                    <strong class="font-extrabold text-[#7B1113]">Regra de Ouro:</strong> Não se compara dinheiro em datas diferentes! Precisamos trazer todas as propostas para o <strong class="font-bold underline decoration-[#7B1113] decoration-4 underline-offset-4">Valor Presente (Data Zero)</strong> usando o custo de oportunidade (<strong class="font-bold text-[#7B1113]">i = 1% a.m.</strong>).
+                                </p>
+                            </div>
+
+                            <!-- Cartão da Fórmula Matemática -->
+                            <div class="bg-white border-2 border-[#7B1113]/25 rounded-3xl p-10 shadow-md flex flex-col items-center">
+                                <span class="text-[21px] font-bold uppercase tracking-[0.15em] text-[#7B1113] mb-4">
+                                    Fórmula do Desconto Racional Composto
+                                </span>
+
+                                <div class="text-[54px] font-display font-extrabold text-[#1F2937] py-4 flex items-center justify-center">
+                                    <span class="text-[#7B1113]">VP</span>
+                                    <span class="mx-6 text-gray-400">=</span>
+                                    <div class="math-fraction">
+                                        <span class="math-numerator accent">VF</span>
+                                        <span class="math-denominator">(1 + i)<sup class="text-[34px] text-[#7B1113] ml-0.5">n</sup></span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Legenda Clara dos Termos -->
+                            <div class="grid grid-cols-2 gap-4">
+                                <div class="bg-[#F8F9FA] border border-gray-200 rounded-2xl p-6 flex items-start gap-4">
+                                    <span class="px-3.5 py-1.5 rounded-xl bg-[#7B1113] text-white font-display font-extrabold text-[26px]">VP</span>
+                                    <div class="text-[25px] leading-snug text-[#1F2937] font-medium">
+                                        <strong class="font-bold block text-gray-900">Valor Presente</strong>
+                                        (hoje / data zero)
+                                    </div>
+                                </div>
+
+                                <div class="bg-[#F8F9FA] border border-gray-200 rounded-2xl p-6 flex items-start gap-4">
+                                    <span class="px-3.5 py-1.5 rounded-xl bg-[#7B1113] text-white font-display font-extrabold text-[26px]">VF</span>
+                                    <div class="text-[25px] leading-snug text-[#1F2937] font-medium">
+                                        <strong class="font-bold block text-gray-900">Valor Futuro</strong>
+                                        (valor da cotação)
+                                    </div>
+                                </div>
+
+                                <div class="bg-[#F8F9FA] border border-gray-200 rounded-2xl p-6 flex items-start gap-4">
+                                    <span class="px-4 py-1.5 rounded-xl bg-[#7B1113] text-white font-display font-extrabold text-[26px]">i</span>
+                                    <div class="text-[25px] leading-snug text-[#1F2937] font-medium">
+                                        <strong class="font-bold block text-gray-900">Taxa de juros</strong>
+                                        (1% = 0,01 a.m.)
+                                    </div>
+                                </div>
+
+                                <div class="bg-[#F8F9FA] border border-gray-200 rounded-2xl p-6 flex items-start gap-4">
+                                    <span class="px-4 py-1.5 rounded-xl bg-[#7B1113] text-white font-display font-extrabold text-[26px]">n</span>
+                                    <div class="text-[25px] leading-snug text-[#1F2937] font-medium">
+                                        <strong class="font-bold block text-gray-900">Prazo</strong>
+                                        em meses
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Rodapé Oficial -->
+                        <div class="bg-[#7B1113] px-16 py-7 flex items-center justify-between text-white">
+                            <span class="font-display font-extrabold text-[24px] tracking-tight">
+                                Curso de Contabilidade Professor Moreira
+                            </span>
+                            <span class="text-[22px] font-semibold text-white/90">
+                                Deslize →
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==================== LÂMINA 3 ==================== -->
+        <section class="flex flex-col items-center gap-3">
+            <div class="w-full max-w-[620px] flex items-center justify-between px-1">
+                <span class="text-sm font-bold text-gray-700 uppercase tracking-wider">Lâmina 03 / 05 — Cálculo dos Fornecedores A e B</span>
+                <button onclick="downloadSingleSlide(3)" class="text-xs font-bold text-[#7B1113] hover:underline flex items-center gap-1 cursor-pointer">
+                    Salvar PNG 1080×1350 ↓
+                </button>
+            </div>
+
+            <div class="slide-preview-wrapper" data-slide-wrapper="" style="width: 256px; height: 320px;">
+                <div class="slide-scale-inner" data-slide-scaler="" style="transform: scale(0.237037);">
+                    <!-- CANVAS REAL 1080x1350 -->
+                    <div id="slide-3" class="slide-canvas editorial-grid-bg">
+                        <!-- Cabeçalho Superior -->
+                        <div class="px-16 pt-14 pb-6 flex items-center justify-between border-b border-gray-200 bg-white">
+                            <span class="inline-flex items-center gap-3 px-5 py-2.5 rounded-xl bg-[#7B1113] text-white font-display font-extrabold text-[22px] tracking-wider uppercase">
+                                PASSO 2 | CÁLCULO NA DATA ZERO
+                            </span>
+                            <span class="font-display font-extrabold text-[24px] text-gray-400">
+                                03 / 05
+                            </span>
+                        </div>
+
+                        <!-- Corpo Central da Lâmina 3 -->
+                        <div class="px-16 py-7 flex-1 flex flex-col justify-center gap-7">
+                            <!-- Título Principal -->
+                            <div>
+                                <div class="w-20 h-2 bg-[#7B1113] rounded-full mb-4"></div>
+                                <h2 class="font-display font-extrabold text-[48px] leading-[1.15] text-[#1F2937] tracking-tight">
+                                    TRAZENDO OS FORNECEDORES A E B PARA HOJE
+                                </h2>
+                            </div>
+
+                            <!-- Cartão 1 — Fornecedor A -->
+                            <div class="bg-white border-2 border-gray-200 rounded-3xl p-8 shadow-sm">
+                                <div class="flex items-center justify-between mb-3">
+                                    <span class="font-display font-extrabold text-[30px] text-[#7B1113]">
+                                        Fornecedor A
+                                    </span>
+                                    <span class="px-4 py-1.5 rounded-full bg-gray-100 text-gray-700 font-bold text-[22px]">
+                                        À vista | n = 0
+                                    </span>
+                                </div>
+                                <p class="text-[27px] text-gray-700 leading-relaxed mb-5">
+                                    Como o pagamento já ocorre hoje, não há desconto financeiro:
+                                </p>
+                                <div class="bg-[#F8F9FA] border border-gray-200 rounded-2xl px-7 py-4 flex items-center justify-between">
+                                    <span class="font-display font-bold text-[30px] text-gray-700">VP<sub class="text-[20px]">A</sub></span>
+                                    <span class="font-display font-extrabold text-[38px] text-[#1F2937]">R$ 3.180,00</span>
+                                </div>
+                            </div>
+
+                            <!-- Cartão 2 — Fornecedor B -->
+                            <div class="bg-white border-2 border-[#7B1113]/40 rounded-3xl p-8 shadow-md">
+                                <div class="flex items-center justify-between mb-3">
+                                    <span class="font-display font-extrabold text-[30px] text-[#7B1113]">
+                                        Fornecedor B
+                                    </span>
+                                    <span class="px-4 py-1.5 rounded-full bg-[#FDF2F2] text-[#7B1113] font-bold text-[22px]">
+                                        Em 1 mês | n = 1
+                                    </span>
+                                </div>
+                                <p class="text-[27px] text-gray-700 leading-relaxed mb-4">
+                                    Descontando 1 mês à taxa de <strong class="text-[#1F2937]">1% a.m.</strong>:
+                                </p>
+
+                                <!-- Fórmula aplicada -->
+                                <div class="text-[32px] font-display font-bold text-[#1F2937] py-3 flex items-center justify-center flex-wrap gap-y-3 bg-[#F8F9FA] rounded-2xl mb-5 border border-gray-200">
+                                    <span>VP<sub class="text-[21px]">B</sub></span>
+                                    <span class="mx-3 text-gray-400">=</span>
+                                    <div class="math-fraction">
+                                        <span class="math-numerator">3.200,00</span>
+                                        <span class="math-denominator">(1 + 0,01)<sup class="text-[22px]">1</sup></span>
+                                    </div>
+                                    <span class="mx-3 text-gray-400">=</span>
+                                    <div class="math-fraction">
+                                        <span class="math-numerator">3.200,00</span>
+                                        <span class="math-denominator">1,01</span>
+                                    </div>
+                                </div>
+
+                                <!-- Resultado Destacado -->
+                                <div class="bg-[#7B1113] text-white rounded-2xl px-7 py-4 flex items-center justify-between shadow-sm">
+                                    <span class="font-display font-bold text-[28px]">VP<sub class="text-[19px]">B</sub> ≈</span>
+                                    <span class="font-display font-extrabold text-[40px] tracking-tight">R$ 3.168,32</span>
+                                </div>
+                            </div>
+
+                            <!-- Caixa de Dica Rápida -->
+                            <div class="bg-[#FDF2F2] border-l-8 border-[#7B1113] rounded-r-2xl px-7 py-5">
+                                <p class="text-[24px] leading-[1.45] text-[#1F2937]">
+                                    <strong class="font-extrabold text-[#7B1113]">Prova real:</strong> R$ 3.168,32 aplicados a 1% ao mês rendem R$ 31,68, totalizando exatamente os <strong>R$ 3.200,00</strong> no vencimento.
+                                </p>
+                            </div>
+                        </div>
+
+                        <!-- Rodapé Oficial -->
+                        <div class="bg-[#7B1113] px-16 py-7 flex items-center justify-between text-white">
+                            <span class="font-display font-extrabold text-[24px] tracking-tight">
+                                Curso de Contabilidade Professor Moreira
+                            </span>
+                            <span class="text-[22px] font-semibold text-white/90">
+                                Deslize →
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==================== LÂMINA 4 ==================== -->
+        <section class="flex flex-col items-center gap-3">
+            <div class="w-full max-w-[620px] flex items-center justify-between px-1">
+                <span class="text-sm font-bold text-gray-700 uppercase tracking-wider">Lâmina 04 / 05 — Cálculo do Fornecedor C</span>
+                <button onclick="downloadSingleSlide(4)" class="text-xs font-bold text-[#7B1113] hover:underline flex items-center gap-1 cursor-pointer">
+                    Salvar PNG 1080×1350 ↓
+                </button>
+            </div>
+
+            <div class="slide-preview-wrapper" data-slide-wrapper="" style="width: 256px; height: 320px;">
+                <div class="slide-scale-inner" data-slide-scaler="" style="transform: scale(0.237037);">
+                    <!-- CANVAS REAL 1080x1350 -->
+                    <div id="slide-4" class="slide-canvas editorial-grid-bg">
+                        <!-- Cabeçalho Superior -->
+                        <div class="px-16 pt-14 pb-6 flex items-center justify-between border-b border-gray-200 bg-white">
+                            <span class="inline-flex items-center gap-3 px-5 py-2.5 rounded-xl bg-[#7B1113] text-white font-display font-extrabold text-[22px] tracking-wider uppercase">
+                                PASSO 3 | CÁLCULO NA DATA ZERO
+                            </span>
+                            <span class="font-display font-extrabold text-[24px] text-gray-400">
+                                04 / 05
+                            </span>
+                        </div>
+
+                        <!-- Corpo Central da Lâmina 4 -->
+                        <div class="px-16 py-8 flex-1 flex flex-col justify-center gap-8">
+                            <!-- Título Principal -->
+                            <div>
+                                <div class="w-20 h-2 bg-[#7B1113] rounded-full mb-4"></div>
+                                <h2 class="font-display font-extrabold text-[48px] leading-[1.15] text-[#1F2937] tracking-tight">
+                                    CALCULANDO O FORNECEDOR C (2 MESES)
+                                </h2>
+                            </div>
+
+                            <!-- Cartão Principal — Fornecedor C -->
+                            <div class="bg-white border-2 border-[#7B1113]/35 rounded-3xl p-9 shadow-md space-y-6">
+                                <div class="flex items-center justify-between">
+                                    <span class="font-display font-extrabold text-[32px] text-[#7B1113]">
+                                        Fornecedor C
+                                    </span>
+                                    <span class="px-5 py-1.5 rounded-full bg-[#FDF2F2] text-[#7B1113] font-bold text-[23px]">
+                                        Em 2 meses | n = 2
+                                    </span>
+                                </div>
+
+                                <p class="text-[28px] text-gray-700 leading-relaxed">
+                                    Descontando 2 meses à taxa de <strong class="text-[#1F2937]">1% a.m.</strong> em regime de juros compostos:
+                                </p>
+
+                                <!-- Etapas do Cálculo -->
+                                <div class="bg-[#F8F9FA] border border-gray-200 rounded-2xl p-6 space-y-5">
+                                    <!-- Linha 1 -->
+                                    <div class="text-[32px] font-display font-bold text-[#1F2937] flex items-center justify-center">
+                                        <span>VP<sub class="text-[21px]">C</sub></span>
+                                        <span class="mx-4 text-gray-400">=</span>
+                                        <div class="math-fraction">
+                                            <span class="math-numerator">3.300,00</span>
+                                            <span class="math-denominator">(1 + 0,01)<sup class="text-[22px] text-[#7B1113]">2</sup></span>
+                                        </div>
+                                        <span class="mx-4 text-gray-400">=</span>
+                                        <div class="math-fraction">
+                                            <span class="math-numerator">3.300,00</span>
+                                            <span class="math-denominator">(1,01)<sup class="text-[22px] text-[#7B1113]">2</sup></span>
+                                        </div>
+                                    </div>
+
+                                    <div class="border-t border-gray-200"></div>
+
+                                    <!-- Linha 2 -->
+                                    <div class="text-[34px] font-display font-bold text-[#1F2937] flex items-center justify-center">
+                                        <span>VP<sub class="text-[22px]">C</sub></span>
+                                        <span class="mx-4 text-gray-400">=</span>
+                                        <div class="math-fraction">
+                                            <span class="math-numerator accent">3.300,00</span>
+                                            <span class="math-denominator text-[#7B1113] font-extrabold">1,0201</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Destaque do Resultado -->
+                                <div class="bg-[#1F2937] text-white rounded-2xl px-8 py-5 flex items-center justify-between">
+                                    <span class="font-display font-bold text-[30px]">VP<sub class="text-[20px]">C</sub> ≈</span>
+                                    <span class="font-display font-extrabold text-[42px] tracking-tight">R$ 3.234,98</span>
+                                </div>
+                            </div>
+
+                            <!-- Caixa de Alerta de Prova -->
+                            <div class="bg-[#FDF2F2] border-2 border-[#7B1113] rounded-2xl p-7 shadow-sm">
+                                <div class="flex items-center gap-3 mb-2">
+                                    <span class="w-8 h-8 rounded-lg bg-[#7B1113] text-white font-extrabold text-[20px] flex items-center justify-center">!</span>
+                                    <span class="font-display font-extrabold text-[25px] text-[#7B1113] uppercase tracking-wide">
+                                        Cuidado com a pegadinha!
+                                    </span>
+                                </div>
+                                <p class="text-[25px] leading-[1.48] text-[#1F2937]">
+                                    Em juros compostos, <strong>(1,01)² = 1,0201</strong> (e não 1,02). Mesmo se o cálculo fosse feito em juros simples, o valor presente seria <strong>R$ 3.235,29</strong> — continuando mais caro que os demais.
+                                </p>
+                            </div>
+                        </div>
+
+                        <!-- Rodapé Oficial -->
+                        <div class="bg-[#7B1113] px-16 py-7 flex items-center justify-between text-white">
+                            <span class="font-display font-extrabold text-[24px] tracking-tight">
+                                Curso de Contabilidade Professor Moreira
+                            </span>
+                            <span class="text-[22px] font-semibold text-white/90">
+                                Deslize →
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==================== LÂMINA 5 ==================== -->
+        <section class="flex flex-col items-center gap-3">
+            <div class="w-full max-w-[620px] flex items-center justify-between px-1">
+                <span class="text-sm font-bold text-gray-700 uppercase tracking-wider">Lâmina 05 / 05 — Comparativo Final e Gabarito</span>
+                <button onclick="downloadSingleSlide(5)" class="text-xs font-bold text-[#7B1113] hover:underline flex items-center gap-1 cursor-pointer">
+                    Salvar PNG 1080×1350 ↓
+                </button>
+            </div>
+
+            <div class="slide-preview-wrapper" data-slide-wrapper="" style="width: 256px; height: 320px;">
+                <div class="slide-scale-inner" data-slide-scaler="" style="transform: scale(0.237037);">
+                    <!-- CANVAS REAL 1080x1350 -->
+                    <div id="slide-5" class="slide-canvas editorial-grid-bg">
+                        <!-- Cabeçalho Superior -->
+                        <div class="px-16 pt-14 pb-6 flex items-center justify-between border-b border-gray-200 bg-white">
+                            <span class="inline-flex items-center gap-3 px-5 py-2.5 rounded-xl bg-[#7B1113] text-white font-display font-extrabold text-[22px] tracking-wider uppercase">
+                                CONCLUSÃO | GABARITO COMENTADO
+                            </span>
+                            <span class="font-display font-extrabold text-[24px] text-gray-400">
+                                05 / 05
+                            </span>
+                        </div>
+
+                        <!-- Corpo Central da Lâmina 5 -->
+                        <div class="px-16 py-8 flex-1 flex flex-col justify-center gap-9">
+                            <!-- Título Principal -->
+                            <div>
+                                <div class="w-20 h-2 bg-[#7B1113] rounded-full mb-4"></div>
+                                <h2 class="font-display font-extrabold text-[48px] leading-[1.15] text-[#1F2937] tracking-tight">
+                                    COMPARATIVO NA DATA ZERO E GABARITO
+                                </h2>
+                            </div>
+
+                            <!-- Tabela Comparativa Final -->
+                            <div class="rounded-3xl overflow-hidden border-2 border-[#7B1113]/30 shadow-md bg-white">
+                                <table class="w-full text-left border-collapse">
+                                    <thead>
+                                        <tr class="bg-[#1F2937] text-white font-display text-[24px]">
+                                            <th class="py-5 px-7 font-bold">Fornecedor</th>
+                                            <th class="py-5 px-7 font-bold">Valor Nominal</th>
+                                            <th class="py-5 px-7 font-bold">Valor Presente Hoje</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="divide-y divide-gray-200 text-[27px]">
+                                        <!-- Fornecedor A -->
+                                        <tr class="bg-white text-gray-700">
+                                            <td class="py-6 px-7 font-bold text-[#1F2937]">Fornecedor A</td>
+                                            <td class="py-6 px-7 font-medium">R$ 3.180,00</td>
+                                            <td class="py-6 px-7 font-semibold text-[#1F2937]">R$ 3.180,00</td>
+                                        </tr>
+
+                                        <!-- Fornecedor B (VENCEDOR DESTACADO) -->
+                                        <tr class="bg-[#FDF2F2] border-y-4 border-[#7B1113]">
+                                            <td class="py-7 px-7 font-extrabold text-[#7B1113]">Fornecedor B</td>
+                                            <td class="py-7 px-7 font-semibold text-[#1F2937]">R$ 3.200,00</td>
+                                            <td class="py-7 px-7">
+                                                <span class="font-display font-extrabold text-[30px] text-[#7B1113] block">
+                                                    R$ 3.168,32
+                                                </span>
+                                                <span class="inline-block mt-1.5 px-3.5 py-1 rounded-full bg-[#7B1113] text-white font-bold text-[19px] uppercase tracking-wider">
+                                                    Menor custo!
+                                                </span>
+                                            </td>
+                                        </tr>
+
+                                        <!-- Fornecedor C -->
+                                        <tr class="bg-white text-gray-700">
+                                            <td class="py-6 px-7 font-bold text-[#1F2937]">Fornecedor C</td>
+                                            <td class="py-6 px-7 font-medium">R$ 3.300,00</td>
+                                            <td class="py-6 px-7 font-semibold text-[#1F2937]">R$ 3.234,98</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <!-- Banner de Gabarito -->
+                            <div class="bg-[#7B1113] text-white rounded-3xl p-10 shadow-xl relative overflow-hidden">
+                                <div class="flex items-center gap-4 mb-4">
+                                    <span class="px-5 py-1.5 rounded-xl bg-white text-[#7B1113] font-display font-extrabold text-[24px] tracking-wider">
+                                        RESPOSTA CORRETA
+                                    </span>
+                                </div>
+                                <div class="font-display font-extrabold text-[54px] leading-none tracking-tight mb-4">
+                                    GABARITO: LETRA B
+                                </div>
+                                <p class="text-[28px] leading-[1.45] text-white/95 font-medium">
+                                    O <strong class="font-extrabold underline decoration-white/60 underline-offset-4">Fornecedor B</strong> oferece o menor desembolso econômico real na data de hoje (economia de <strong>R$ 11,68</strong> em relação ao Fornecedor A).
+                                </p>
+                            </div>
+                        </div>
+
+                        <!-- Rodapé Oficial -->
+                        <div class="bg-[#F8F9FA] border-t-2 border-gray-200 px-14 py-7 flex items-center justify-between">
+                            <span class="text-[23px] font-bold text-[#7B1113]">
+                                Salve este post para revisar depois!
+                            </span>
+                            <span class="font-display font-extrabold text-[22px] text-[#1F2937] tracking-tight">
+                                Curso de Contabilidade Professor Moreira
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Modal para Visualizar e Copiar o Código-Fonte HTML/CSS Completo -->
+    <div id="source-modal" class="fixed inset-0 z-50 hidden bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl max-w-4xl w-full max-h-[88vh] flex flex-col shadow-2xl overflow-hidden">
+            <div class="px-6 py-4 bg-[#7B1113] text-white flex items-center justify-between">
+                <div>
+                    <h3 class="font-display font-bold text-lg">Código-Fonte HTML/CSS Completo</h3>
+                    <p class="text-xs text-white/80">Salve como <code class="bg-black/20 px-1.5 py-0.5 rounded">carrossel.html</code> para abrir localmente no navegador.</p>
+                </div>
+                <button onclick="closeSourceModal()" class="p-2 rounded-lg hover:bg-white/15 transition cursor-pointer">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </button>
+            </div>
+            <div class="p-4 flex-1 overflow-hidden flex flex-col gap-3">
+                <textarea id="source-code-textarea" readonly="" class="w-full flex-1 font-mono text-xs bg-gray-900 text-gray-100 p-4 rounded-xl border border-gray-700 resize-none focus:outline-none"></textarea>
+                <div class="flex items-center justify-end gap-3">
+                    <button onclick="copySourceCode()" class="px-5 py-2.5 rounded-xl bg-[#7B1113] hover:bg-[#5C0A0C] text-white font-bold text-sm transition cursor-pointer">
+                        Copiar Código Completo
+                    </button>
+                    <button onclick="closeSourceModal()" class="px-4 py-2.5 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-800 font-semibold text-sm transition cursor-pointer">
+                        Fechar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Contêiner oculto fora da tela para renderização 1:1 (1080x1350px) sem transformações CSS -->
+    <div id="export-stage" style="position: fixed; left: -9999px; top: 0; width: 1080px; height: 1350px; pointer-events: none; z-index: -1;"></div>
+
+    <!-- Toast de Notificação -->
+    <div id="toast-container" class="fixed bottom-5 right-5 z-50 flex flex-col gap-2 pointer-events-none"></div>
+
+    <script>
+        /**
+         * Ajusta proporcionalmente a visualização das lâminas 1080x1350px
+         * para caberem perfeitamente em telas mobile, tablet e desktop.
+         */
+        function updateResponsiveScales() {
+            const wrappers = document.querySelectorAll('[data-slide-wrapper]');
+            const maxPreviewWidth = Math.min(window.innerWidth - 32, 620);
+            const scale = maxPreviewWidth / 1080;
+
+            wrappers.forEach(wrapper => {
+                const scaler = wrapper.querySelector('[data-slide-scaler]');
+                wrapper.style.width = `${1080 * scale}px`;
+                wrapper.style.height = `${1350 * scale}px`;
+                scaler.style.transform = `scale(${scale})`;
+            });
+        }
+
+        window.addEventListener('resize', updateResponsiveScales);
+        window.addEventListener('DOMContentLoaded', updateResponsiveScales);
+
+        /**
+         * Exibe notificação visual elegante sem usar alert()
+         */
+        function showToast(message, type = 'info') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            const bgClass = type === 'success' ? 'bg-emerald-700' : (type === 'error' ? 'bg-red-800' : 'bg-gray-900');
+
+            toast.className = `toast-enter ${bgClass} text-white px-5 py-3.5 rounded-xl shadow-xl text-sm font-semibold flex items-center gap-3 pointer-events-auto`;
+            toast.innerHTML = `
+                <span class="w-2.5 h-2.5 rounded-full bg-white animate-pulse"></span>
+                <span>${message}</span>
+            `;
+            container.appendChild(toast);
+
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transition = 'opacity 0.3s ease';
+                setTimeout(() => toast.remove(), 300);
+            }, 3500);
+        }
+
+        /**
+         * Renderiza uma lâmina específica clonando-a no palco 1:1 (1080x1350px)
+         * sem qualquer escala CSS, garantindo nitidez editorial perfeita.
+         */
+        async function renderSlideToDataURL(slideNumber) {
+            const originalSlide = document.getElementById(`slide-${slideNumber}`);
+            const stage = document.getElementById('export-stage');
+
+            if (!originalSlide) throw new Error(`Lâmina ${slideNumber} não encontrada.`);
+
+            // Limpa e insere clone sem transformações
+            stage.innerHTML = '';
+            const clone = originalSlide.cloneNode(true);
+            clone.id = `export-slide-${slideNumber}`;
+            clone.style.transform = 'none';
+            clone.style.boxShadow = 'none';
+            stage.appendChild(clone);
+
+            // Aguarda fontes carregarem completamente
+            if (document.fonts && document.fonts.ready) {
+                await document.fonts.ready;
+            }
+
+            const canvas = await html2canvas(clone, {
+                width: 1080,
+                height: 1350,
+                scale: 2, // 2x (2160x2700px efetivos) para máxima nitidez no Instagram
+                useCORS: true,
+                backgroundColor: '#FFFFFF',
+                logging: false
+            });
+
+            stage.innerHTML = '';
+            return canvas.toDataURL('image/png', 1.0);
+        }
+
+        /**
+         * Dispara o download de um arquivo PNG
+         */
+        function triggerDownload(dataUrl, filename) {
+            const link = document.createElement('a');
+            link.download = filename;
+            link.href = dataUrl;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        /**
+         * Baixa uma lâmina individualmente
+         */
+        async function downloadSingleSlide(slideNumber) {
+            const btn = document.getElementById(`btn-dl-${slideNumber}`);
+            const originalText = btn ? btn.innerText : '';
+
+            try {
+                if (btn) {
+                    btn.disabled = true;
+                    btn.innerText = 'Gerando...';
+                }
+                showToast(`Gerando Lâmina 0${slideNumber} (1080×1350px)...`);
+
+                const dataUrl = await renderSlideToDataURL(slideNumber);
+                triggerDownload(dataUrl, `Prof-Moreira-Carrossel-Lamina-0${slideNumber}.png`);
+
+                showToast(`Lâmina 0${slideNumber} baixada com sucesso!`, 'success');
+            } catch (err) {
+                console.error(err);
+                showToast(`Erro ao gerar Lâmina 0${slideNumber}.`, 'error');
+            } finally {
+                if (btn) {
+                    btn.disabled = false;
+                    btn.innerText = originalText;
+                }
+            }
+        }
+
+        /**
+         * Baixa todas as 5 lâminas em sequência com intervalo seguro para o navegador
+         */
+        async function downloadAllSlides() {
+            const btnAll = document.getElementById('btn-dl-all');
+            const originalHTML = btnAll.innerHTML;
+
+            try {
+                btnAll.disabled = true;
+                btnAll.innerHTML = `<span>Gerando 5 Lâminas...</span>`;
+                showToast('Iniciando geração em alta resolução das 5 lâminas...');
+
+                for (let i = 1; i <= 5; i++) {
+                    btnAll.innerHTML = `<span>Exportando ${i}/5...</span>`;
+                    const dataUrl = await renderSlideToDataURL(i);
+                    triggerDownload(dataUrl, `Prof-Moreira-Carrossel-Lamina-0${i}.png`);
+                    // Pequeno intervalo para o navegador processar múltiplos downloads sem bloquear
+                    await new Promise(resolve => setTimeout(resolve, 450));
+                }
+
+                showToast('Todas as 5 lâminas (1080×1350px) foram baixadas!', 'success');
+            } catch (err) {
+                console.error(err);
+                showToast('Ocorreu um erro durante a exportação em lote.', 'error');
+            } finally {
+                btnAll.disabled = false;
+                btnAll.innerHTML = originalHTML;
+            }
+        }
+
+        /**
+         * Abre modal com o código-fonte HTML completo
+         */
+        function openSourceModal() {
+            const modal = document.getElementById('source-modal');
+            const textarea = document.getElementById('source-code-textarea');
+            textarea.value = '<!DOCTYPE html>\n' + document.documentElement.outerHTML;
+            modal.classList.remove('hidden');
+        }
+
+        function closeSourceModal() {
+            document.getElementById('source-modal').classList.add('hidden');
+        }
+
+        function copySourceCode() {
+            const textarea = document.getElementById('source-code-textarea');
+            textarea.select();
+            textarea.setSelectionRange(0, 999999);
+            try {
+                document.execCommand('copy');
+                showToast('Código HTML/CSS copiado para a área de transferência!', 'success');
+            } catch (err) {
+                showToast('Não foi possível copiar automaticamente. Selecione e pressione Ctrl+C.', 'error');
+            }
+        }
+    </script>
+
+</body></html>
